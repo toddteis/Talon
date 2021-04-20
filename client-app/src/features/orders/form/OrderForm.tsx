@@ -6,9 +6,10 @@ interface Props {
     order: Order | undefined;
     closeForm: () => void;
     createOrEdit: (order: Order) => void;
+    submitting: boolean;
 }
 
-export default function OrderForm({ order: selectedOrder, closeForm, createOrEdit }: Props) {
+export default function OrderForm({ order: selectedOrder, closeForm, createOrEdit, submitting }: Props) {
 
     const initialState = selectedOrder ?? {
         id: '',
@@ -35,12 +36,12 @@ export default function OrderForm({ order: selectedOrder, closeForm, createOrEdi
         <Segment clearing>
             <Form onSubmit={handleSubmit} autoComplete='off'>
                 <Form.Input placeholder='Customer' value={order.customer} name='customer' onChange={handleInputChange} />
-                <Form.Input placeholder='Date Ordered' value={order.dateOrdered} name='dateOrdered' onChange={handleInputChange} />
-                <Form.Input placeholder='Date Shipped' value={order.dateShipped} name='dateShipped' onChange={handleInputChange} />
+                <Form.Input type='date' placeholder='Date Ordered' value={order.dateOrdered} name='dateOrdered' onChange={handleInputChange} />
+                <Form.Input type='date' placeholder='Date Shipped' value={order.dateShipped} name='dateShipped' onChange={handleInputChange} />
                 <Form.Input placeholder='Product' value={order.product} name='product' onChange={handleInputChange} />
                 <Form.Input placeholder='Amount' value={order.amount} name='amount' onChange={handleInputChange} />
                 <Form.Input placeholder='Delivery Address' value={order.deliveryAddress} name='deliveryAddress' onChange={handleInputChange} />
-                <Button floated='right' positive type='submit' content='Submit' />
+                <Button loading={submitting} floated='right' positive type='submit' content='Submit' />
                 <Button onClick={closeForm} floated='right' type='button' content='Cancel' />
             </Form>
         </Segment>

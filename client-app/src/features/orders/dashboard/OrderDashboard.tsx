@@ -15,16 +15,18 @@ interface Props {
     closeForm: () => void;
     createOrEdit: (order: Order) => void;
     deleteOrder: (id: string) => void;
+    submitting: boolean;
 }
 
 export default function OrderDashboard({orders, selectedOrder, selectOrder, 
-        cancelSelectOrder, editMode, openForm, closeForm, createOrEdit, deleteOrder}: Props) {
+        cancelSelectOrder, editMode, openForm, closeForm, createOrEdit, deleteOrder, submitting}: Props) {
     return (
         <Grid>
             <Grid.Column width='10'>
                 <OrderList orders={orders} 
                     selectOrder={selectOrder}
                     deleteOrder={deleteOrder}
+                    submitting={submitting}
                 />
             </Grid.Column>
             <Grid.Column width='6'>
@@ -35,7 +37,12 @@ export default function OrderDashboard({orders, selectedOrder, selectOrder,
                     openForm={openForm}
                 />}
                 {editMode &&
-                <OrderForm closeForm={closeForm} order={selectedOrder} createOrEdit={createOrEdit} />}
+                <OrderForm 
+                    closeForm={closeForm}
+                    order={selectedOrder}
+                    createOrEdit={createOrEdit}
+                    submitting={submitting}
+                />}
             </Grid.Column>
         </Grid>
     )
