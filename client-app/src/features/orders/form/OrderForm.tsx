@@ -1,15 +1,11 @@
+import { observer } from 'mobx-react-lite';
 import React, { ChangeEvent, useState } from 'react';
 import { Button, Form, Segment } from 'semantic-ui-react';
-import { Order } from '../../../app/models/order';
+import { useStore } from '../../../app/stores/store';
 
-interface Props {
-    order: Order | undefined;
-    closeForm: () => void;
-    createOrEdit: (order: Order) => void;
-    submitting: boolean;
-}
-
-export default function OrderForm({ order: selectedOrder, closeForm, createOrEdit, submitting }: Props) {
+export default observer(function OrderForm() {
+    const {orderStore} = useStore();
+    const {selectedOrder, closeForm, createOrder, updateOrder, loading} = orderStore;
 
     const initialState = selectedOrder ?? {
         id: '',
@@ -24,7 +20,7 @@ export default function OrderForm({ order: selectedOrder, closeForm, createOrEdi
     const [order, setOrder] = useState(initialState);
 
     function handleSubmit() {
-        createOrEdit(order);
+        order.id ? updateOrder(order) : createOrder(order);
     }
 
     function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
@@ -41,9 +37,9 @@ export default function OrderForm({ order: selectedOrder, closeForm, createOrEdi
                 <Form.Input placeholder='Product' value={order.product} name='product' onChange={handleInputChange} />
                 <Form.Input placeholder='Amount' value={order.amount} name='amount' onChange={handleInputChange} />
                 <Form.Input placeholder='Delivery Address' value={order.deliveryAddress} name='deliveryAddress' onChange={handleInputChange} />
-                <Button loading={submitting} floated='right' positive type='submit' content='Submit' />
+                <Button loading={loading} floated='right' positive type='submit' content='Submit' />
                 <Button onClick={closeForm} floated='right' type='button' content='Cancel' />
             </Form>
         </Segment>
     )
-}
+})

@@ -1,27 +1,23 @@
+import { observer } from 'mobx-react-lite';
 import React, { SyntheticEvent, useState } from 'react';
 import { Button, Item, Label, Segment } from 'semantic-ui-react';
-import { Order } from '../../../app/models/order';
+import { useStore } from '../../../app/stores/store';
 
+export default observer(function OrderList() {
+    const { orderStore } = useStore();
+    const {deleteOrder, loading, ordersByDate} = orderStore;
 
-interface Props {
-    orders: Order[];
-    selectOrder: (id: string) => void;
-    deleteOrder: (id: string) => void;
-    submitting: boolean;
-}
-
-export default function OrderList({orders, selectOrder, deleteOrder, submitting}: Props) {
     const [target, setTarget] = useState('');
 
     function handleOrderDelete(e: SyntheticEvent<HTMLButtonElement>, id: string) {
         setTarget(e.currentTarget.name);
         deleteOrder(id);
     }
-    
+
     return (
         <Segment>
             <Item.Group divided>
-                {orders.map(order => (
+                {ordersByDate.map(order => (
                     <Item key={order.id}>
                         <Item.Header as='a'>{order.customer}</Item.Header>
                         <Item.Meta>
@@ -32,18 +28,18 @@ export default function OrderList({orders, selectOrder, deleteOrder, submitting}
                             <div>{order.amount}</div>
                             <div>{order.deliveryAddress}</div>
                         </Item.Description>
-                        <Button onClick={() => selectOrder(order.id)} floated='right' content='View' color='blue'/>
-                        <Button 
+                        <Button onClick={() => orderStore.selectOrder(order.id)} floated='right' content='View' color='blue' />
+                        <Button
                             name={order.id}
-                            loading={submitting && target === order.id } 
-                            onClick={(e) => handleOrderDelete(e, order.id)} 
-                            floated='right' 
-                            content='Delete' 
-                            color='red'/>
+                            loading={loading && target === order.id}
+                            onClick={(e) => handleOrderDelete(e, order.id)}
+                            floated='right'
+                            content='Delete'
+                            color='red' />
                         <Label basic content={order.product} />
                     </Item>
                 ))}
             </Item.Group>
         </Segment>
     )
-}
+})

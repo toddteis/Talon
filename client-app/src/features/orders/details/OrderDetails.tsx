@@ -1,14 +1,14 @@
 import React from 'react';
 import { Button, Card } from 'semantic-ui-react';
-import { Order } from '../../../app/models/order';
+import LoadingComponent from '../../../app/layout/LoadingComponent';
+import { useStore } from '../../../app/stores/store';
 
-interface Props {
-    order: Order
-    cancelSelectOrder: () => void;
-    openForm: (id: string) => void;
-}
+export default function OrderDetails() {
+    const {orderStore} = useStore();
+    const {selectedOrder: order, openForm, cancelSelectedOrder} = orderStore;
 
-export default function OrderDetails({ order, cancelSelectOrder, openForm }: Props) {
+    if(!order) return <LoadingComponent />;
+
     return (
         <Card fluid>
             <Card.Content>
@@ -23,7 +23,7 @@ export default function OrderDetails({ order, cancelSelectOrder, openForm }: Pro
             <Card.Content extra>
                 <Button.Group widths='2'>
                     <Button onClick={() =>openForm(order.id) } basic color='blue' content='Edit' />
-                    <Button onClick={cancelSelectOrder} basic color='grey' content='Cancel' />
+                    <Button onClick={cancelSelectedOrder} basic color='grey' content='Cancel' />
                 </Button.Group>
 
             </Card.Content>
