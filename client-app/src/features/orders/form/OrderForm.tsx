@@ -1,13 +1,19 @@
 import { observer } from 'mobx-react-lite';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router';
 import { Button, Form, Segment } from 'semantic-ui-react';
+import LoadingComponent from '../../../app/layout/LoadingComponent';
 import { useStore } from '../../../app/stores/store';
+import { v4 as uuid } from 'uuid';
+import { Link } from 'react-router-dom';
 
 export default observer(function OrderForm() {
+    const history = useHistory();
     const {orderStore} = useStore();
-    const {selectedOrder, closeForm, createOrder, updateOrder, loading} = orderStore;
+    const { createOrder, updateOrder, loading, loadOrder, loadingInitial} = orderStore;
+    const {id} = useParams<{id: string}>();
 
-    const initialState = selectedOrder ?? {
+    const [order, setOrder] = useState({
         id: '',
         customer: '',
         dateOrdered: '',
@@ -15,18 +21,30 @@ export default observer(function OrderForm() {
         product: '',
         amount: '',
         deliveryAddress: ''
-    }
+    });
 
-    const [order, setOrder] = useState(initialState);
+    useEffect(() => {
+        if (id) loadOrder(id).then(order => setOrder(order!))
+    }, [id, loadOrder]);
 
     function handleSubmit() {
-        order.id ? updateOrder(order) : createOrder(order);
+        if (order.id.length === 0) {
+            let newOrder = {
+                ...order,
+                id: uuid()
+            };
+            createOrder(newOrder).then(() => history.push(`/orders/${newOrder.id}`))
+        } else {
+            updateOrder(order).then(() => history.push(`/orders/${order.id}`))
+        }
     }
 
     function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
         const {name, value} =event.target;
         setOrder({...order, [name]: value})
     }
+
+    if (loadingInitial) return <LoadingComponent content='Loading order...' />
 
     return (
         <Segment clearing>
@@ -38,7 +56,7 @@ export default observer(function OrderForm() {
                 <Form.Input placeholder='Amount' value={order.amount} name='amount' onChange={handleInputChange} />
                 <Form.Input placeholder='Delivery Address' value={order.deliveryAddress} name='deliveryAddress' onChange={handleInputChange} />
                 <Button loading={loading} floated='right' positive type='submit' content='Submit' />
-                <Button onClick={closeForm} floated='right' type='button' content='Cancel' />
+                <Button as={Link} to='/orders' floated='right' type='button' content='Cancel' />
             </Form>
         </Segment>
     )

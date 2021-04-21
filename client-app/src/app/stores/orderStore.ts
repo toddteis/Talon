@@ -1,7 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Order } from "../models/order";
-import {v4 as uuid} from 'uuid';
 
 export default class OrderStore {
     orderRegistry = new Map<string, Order>();
@@ -19,12 +18,11 @@ export default class OrderStore {
     }
 
     loadOrders = async () => {
+        this.loadingInitial = true;
         try {
             const orders = await agent.Orders.list();
             orders.forEach(order => {
-                order.dateOrdered = order.dateOrdered.split('T')[0];
-                order.dateShipped = order.dateShipped.split('T')[0];
-                this.orderRegistry.set(order.id, order);
+                this.setOrder(order);
             })
             this.setLoadingInitial(false);
         } catch (error) {
@@ -33,30 +31,44 @@ export default class OrderStore {
         }
     }
 
+    loadOrder = async (id: string) => {
+        let order = this.getOrder(id);
+        if (order) {
+            this.selectedOrder = order;
+            return order;
+        } else {
+            this.loadingInitial = true;
+            try {
+                order = await agent.Orders.details(id);
+                this.setOrder(order);
+                runInAction(() => {
+                    this.selectedOrder = order;
+                })
+                this.setLoadingInitial(false);
+                return order;
+            } catch (error) {
+                console.log(error);
+                this.setLoadingInitial(false);
+            }
+        }
+    }
+
+    private setOrder = (order: Order) => {
+        order.dateOrdered = order.dateOrdered.split('T')[0];
+        order.dateShipped = order.dateShipped.split('T')[0];
+        this.orderRegistry.set(order.id, order);
+    }
+
+    private getOrder = (id: string) => {
+        return this.orderRegistry.get(id);
+    }
+
     setLoadingInitial = (state: boolean) => {
         this.loadingInitial = state;
     }
 
-    selectOrder = (id: string) => {
-        this.selectedOrder = this.orderRegistry.get(id);
-    }
-
-    cancelSelectedOrder = () => {
-        this.selectedOrder = undefined;
-    }
-
-    openForm = (id?: string) => {
-        id ? this.selectOrder(id) : this.cancelSelectedOrder();
-        this.editMode = true;
-    }
-
-    closeForm = () => {
-        this.editMode = false;
-    }
-
     createOrder = async (order: Order) => {
         this.loading = true;
-        order.id = uuid();
         try {
             await agent.Orders.create(order);
             runInAction(() => {
@@ -97,7 +109,6 @@ export default class OrderStore {
             await agent.Orders.delete(id);
             runInAction(() => {
                 this.orderRegistry.delete(id);
-                if (this.selectedOrder?.id === id) this.cancelSelectedOrder();
                 this.loading = false;
             })
         } catch (error) {
