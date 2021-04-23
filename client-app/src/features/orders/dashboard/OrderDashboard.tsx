@@ -17,11 +17,8 @@ export default observer(function OrderDashboard() {
 
     return (
         <Grid>
-            <Grid.Column width='10'>
+            <Grid.Column width='16'>
                 <OrderList />
-            </Grid.Column>
-            <Grid.Column width='6'>
-                <h2>Order Filters</h2>
             </Grid.Column>
         </Grid>
     )

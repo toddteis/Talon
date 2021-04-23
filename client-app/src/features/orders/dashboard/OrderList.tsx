@@ -1,12 +1,12 @@
 import { observer } from 'mobx-react-lite';
 import React, { SyntheticEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Item, Label, Segment } from 'semantic-ui-react';
+import { Button, Table } from 'semantic-ui-react';
 import { useStore } from '../../../app/stores/store';
 
 export default observer(function OrderList() {
     const { orderStore } = useStore();
-    const {deleteOrder, loading, ordersByDate} = orderStore;
+    const { deleteOrder, loading, ordersByDate } = orderStore;
 
     const [target, setTarget] = useState('');
 
@@ -16,31 +16,37 @@ export default observer(function OrderList() {
     }
 
     return (
-        <Segment>
-            <Item.Group divided>
+        <Table striped>
+            <Table.Header>
+                <Table.Row>
+                    <Table.HeaderCell>Customer</Table.HeaderCell>
+                    <Table.HeaderCell>Order Date</Table.HeaderCell>
+                    <Table.HeaderCell>Shipped Date</Table.HeaderCell>
+                    <Table.HeaderCell>Product Ordered</Table.HeaderCell>
+                    <Table.HeaderCell>Amount</Table.HeaderCell>
+                </Table.Row>
+            </Table.Header>
+
+            <Table.Body>
                 {ordersByDate.map(order => (
-                    <Item key={order.id}>
-                        <Item.Header as='a'>{order.customer}</Item.Header>
-                        <Item.Meta>
-                            {order.dateOrdered}, {order.dateShipped}
-                        </Item.Meta>
-                        <Item.Description>
-                            <div>{order.product}</div>
-                            <div>{order.amount}</div>
-                            <div>{order.deliveryAddress}</div>
-                        </Item.Description>
-                        <Button as={Link} to={`/orders/${order.id}`} floated='right' content='View' color='blue' />
-                        <Button
-                            name={order.id}
-                            loading={loading && target === order.id}
-                            onClick={(e) => handleOrderDelete(e, order.id)}
-                            floated='right'
-                            content='Delete'
-                            color='red' />
-                        <Label basic content={order.product} />
-                    </Item>
+                    <Table.Row key={order.id}>
+                        <Table.Cell>{order.customer}</Table.Cell>
+                        <Table.Cell>{order.dateOrdered}</Table.Cell>
+                        <Table.Cell>{order.dateShipped}</Table.Cell>
+                        <Table.Cell>{order.product}</Table.Cell>
+                        <Table.Cell>{order.amount}</Table.Cell>
+                        <Table.Cell><Button as={Link} to={`/orders/${order.id}`} floated='right' content='View' color='blue' /></Table.Cell>
+                        <Table.Cell><Button
+                                    name={order.id}
+                                    loading={loading && target === order.id}
+                                    onClick={(e) => handleOrderDelete(e, order.id)}
+                                    floated='right'
+                                    content='Delete'
+                                    color='red' />
+                        </Table.Cell>
+                    </Table.Row>
                 ))}
-            </Item.Group>
-        </Segment>
+            </Table.Body>
+        </Table>
     )
 })
