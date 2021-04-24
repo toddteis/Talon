@@ -7,14 +7,14 @@ export default class OrderStore {
     selectedOrder: Order | undefined = undefined;
     editMode = false;
     loading = false;
-    loadingInitial = true;
+    loadingInitial = false;
 
     constructor() {
         makeAutoObservable(this)
     }
 
     get ordersByDate() {
-        return Array.from(this.orderRegistry.values()).sort((a, b) => Date.parse(a.dateOrdered) - Date.parse(b.dateOrdered));
+        return Array.from(this.orderRegistry.values()).sort((a, b) => a.dateOrdered!.getDate() - b.dateOrdered!.getDate());
     }
 
     loadOrders = async () => {
@@ -54,8 +54,8 @@ export default class OrderStore {
     }
 
     private setOrder = (order: Order) => {
-        order.dateOrdered = order.dateOrdered.split('T')[0];
-        order.dateShipped = order.dateShipped.split('T')[0];
+        order.dateOrdered = new Date(order.dateOrdered!);
+        order.dateShipped = new Date(order.dateShipped!);
         this.orderRegistry.set(order.id, order);
     }
 

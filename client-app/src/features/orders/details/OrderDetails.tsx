@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Button, Table } from 'semantic-ui-react';
 import LoadingComponent from '../../../app/layout/LoadingComponent';
 import { useStore } from '../../../app/stores/store';
+import {format} from 'date-fns';
 
 export default observer(function OrderDetails() {
     const { orderStore } = useStore();
@@ -35,8 +36,8 @@ export default observer(function OrderDetails() {
                     <Table.Row>
                         <Table.Cell>{order.id}</Table.Cell>
                         <Table.Cell>{order.customer}</Table.Cell>
-                        <Table.Cell>{order.dateOrdered}</Table.Cell>
-                        <Table.Cell>{order.dateShipped}</Table.Cell>
+                        <Table.Cell>{format(order.dateOrdered!, 'dd MMM yyyy')}</Table.Cell>
+                        <Table.Cell>{format(order.dateShipped!, 'dd MMM yyyy' )}</Table.Cell>
                         <Table.Cell>{order.product}</Table.Cell>
                         <Table.Cell>{order.amount}</Table.Cell>
                         <Table.Cell>{order.deliveryAddress}</Table.Cell>

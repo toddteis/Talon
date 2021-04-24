@@ -1,33 +1,50 @@
 import { observer } from 'mobx-react-lite';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
-import { Button, Form, Segment } from 'semantic-ui-react';
+import { Button, Header, Segment } from 'semantic-ui-react';
 import LoadingComponent from '../../../app/layout/LoadingComponent';
 import { useStore } from '../../../app/stores/store';
 import { v4 as uuid } from 'uuid';
 import { Link } from 'react-router-dom';
+import { Formik, Form, } from 'formik';
+import * as Yup from 'yup';
+import MyTextInput from '../../../app/common/form/MyTextInput';
+import MySelectInput from '../../../app/common/form/MySelectInput';
+import { productOptions } from '../../../app/common/form/options/productOptions';
+import MyDateInput from '../../../app/common/form/MyDateInput';
+import { Order } from '../../../app/models/order';
 
 export default observer(function OrderForm() {
     const history = useHistory();
-    const {orderStore} = useStore();
-    const { createOrder, updateOrder, loading, loadOrder, loadingInitial} = orderStore;
-    const {id} = useParams<{id: string}>();
+    const { orderStore } = useStore();
+    const { createOrder, updateOrder, loading, loadOrder, loadingInitial } = orderStore;
+    const { id } = useParams<{ id: string }>();
 
-    const [order, setOrder] = useState({
+    const [order, setOrder] = useState<Order>({
         id: '',
         customer: '',
-        dateOrdered: '',
-        dateShipped: '',
+        dateOrdered: null,
+        dateShipped: null,
         product: '',
         amount: '',
         deliveryAddress: ''
     });
 
+    const validationSchema = Yup.object({
+        customer: Yup.string().required('The order customer is required'),
+        dateOrdered: Yup.string().required('Order date is required').nullable(),
+        dateShipped: Yup.string().required('Shipped date is required').nullable(),
+        product: Yup.string().required(),
+        amount: Yup.string().required(),
+        deliveryAddress: Yup.string().required(),
+
+    })
+
     useEffect(() => {
         if (id) loadOrder(id).then(order => setOrder(order!))
     }, [id, loadOrder]);
 
-    function handleSubmit() {
+    function handleFormSubmit(order: Order) {
         if (order.id.length === 0) {
             let newOrder = {
                 ...order,
@@ -39,25 +56,42 @@ export default observer(function OrderForm() {
         }
     }
 
-    function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-        const {name, value} =event.target;
-        setOrder({...order, [name]: value})
-    }
-
     if (loadingInitial) return <LoadingComponent content='Loading order...' />
 
     return (
         <Segment clearing>
-            <Form onSubmit={handleSubmit} autoComplete='off'>
-                <Form.Input placeholder='Customer' value={order.customer} name='customer' onChange={handleInputChange} />
-                <Form.Input type='date' placeholder='Date Ordered' value={order.dateOrdered} name='dateOrdered' onChange={handleInputChange} />
-                <Form.Input type='date' placeholder='Date Shipped' value={order.dateShipped} name='dateShipped' onChange={handleInputChange} />
-                <Form.Input placeholder='Product' value={order.product} name='product' onChange={handleInputChange} />
-                <Form.Input placeholder='Amount' value={order.amount} name='amount' onChange={handleInputChange} />
-                <Form.Input placeholder='Delivery Address' value={order.deliveryAddress} name='deliveryAddress' onChange={handleInputChange} />
-                <Button loading={loading} floated='right' positive type='submit' content='Submit' />
-                <Button as={Link} to='/orders' floated='right' type='button' content='Cancel' />
-            </Form>
+            <Formik
+                validationSchema={validationSchema}
+                enableReinitialize
+                initialValues={order}
+                onSubmit={values => handleFormSubmit(values)} >
+                {({ handleSubmit, isValid, isSubmitting, dirty }) => (
+                    <Form className='ui form' onSubmit={handleSubmit} autoComplete='off'>
+                        <Header content='Order Details' sub />
+                        <MyTextInput name='customer' placeholder='Customer' />
+                        <MyDateInput 
+                            placeholderText='Date Ordered' 
+                            name='dateOrdered'
+                            dateFormat='d MMMM, yyyy'
+                        />
+                        <MyDateInput 
+                            placeholderText='Date Shipped'
+                            name='dateShipped'
+                            dateFormat='d MMMM, yyyy'
+                        />
+                        <MySelectInput options={productOptions} placeholder='Product' name='product' />
+                        <MyTextInput placeholder='Amount' name='amount' />
+                        <MyTextInput placeholder='Delivery Address' name='deliveryAddress' />
+                        <Button 
+                            disabled={isSubmitting || !dirty || !isValid}
+                            loading={loading} floated='right' 
+                            positive type='submit' content='Submit' 
+                        />
+                        <Button as={Link} to='/orders' floated='right' type='button' content='Cancel' />
+                    </Form>
+                )}
+            </Formik>
+
         </Segment>
     )
 })

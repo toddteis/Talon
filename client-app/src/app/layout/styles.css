@@ -5,3 +5,7 @@ body {
 .ui.invered.top.fixed.menu {
   background-color: #222222;
 }
+
+.react-datepicker-wrapper {
+  width: 100%;
+}

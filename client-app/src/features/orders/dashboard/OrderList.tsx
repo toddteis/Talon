@@ -3,6 +3,7 @@ import React, { SyntheticEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Table } from 'semantic-ui-react';
 import { useStore } from '../../../app/stores/store';
+import {format} from 'date-fns';
 
 export default observer(function OrderList() {
     const { orderStore } = useStore();
@@ -31,8 +32,8 @@ export default observer(function OrderList() {
                 {ordersByDate.map(order => (
                     <Table.Row key={order.id}>
                         <Table.Cell>{order.customer}</Table.Cell>
-                        <Table.Cell>{order.dateOrdered}</Table.Cell>
-                        <Table.Cell>{order.dateShipped}</Table.Cell>
+                        <Table.Cell>{format(order.dateOrdered!, 'dd MMM yyyy' )}</Table.Cell>
+                        <Table.Cell>{format(order.dateShipped!, 'dd MMM yyyy')}</Table.Cell>
                         <Table.Cell>{order.product}</Table.Cell>
                         <Table.Cell>{order.amount}</Table.Cell>
                         <Table.Cell><Button as={Link} to={`/orders/${order.id}`} floated='right' content='View' color='blue' /></Table.Cell>
