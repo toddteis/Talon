@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Core;
 using Domain;
 using MediatR;
 using Persistence;
@@ -9,12 +10,12 @@ namespace Application.Orders
 {
     public class Details
     {
-        public class Query : IRequest<Order>
+        public class Query : IRequest<Result<Order>>
         {
             public Guid Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, Order>
+        public class Handler : IRequestHandler<Query, Result<Order>>
         {
             private readonly DataContext _context;
             public Handler(DataContext context)
@@ -22,9 +23,11 @@ namespace Application.Orders
                 _context = context;
             }
 
-            public async Task<Order> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<Order>> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Orders.FindAsync(request.Id);
+                var order = await _context.Orders.FindAsync(request.Id);
+
+                return Result<Order>.Success(order);
             }
         }
     }

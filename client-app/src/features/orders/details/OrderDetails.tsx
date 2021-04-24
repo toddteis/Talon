@@ -44,7 +44,7 @@ export default observer(function OrderDetails() {
                 </Table.Body>
                 <Table.Footer>
                     <Table.Row>
-                        <Table.HeaderCell colspan='7'>
+                        <Table.HeaderCell colSpan='7'>
                             <Button floated='right' as={Link} to={`/manage/${order.id}`} basic color='blue' content='Edit'/>
                             <Button floated='right' as={Link} to='/orders' basic color='grey' content='Cancel' />
                         </Table.HeaderCell>

@@ -15,6 +15,7 @@ export default function NavBar() {
                 <Menu.Item as={NavLink} to='/contact' name='Contact us'/>
                 <Menu.Item as={NavLink} to='/resources' name='Resources'/>
                 <Menu.Item as={NavLink} to='/orders' name='Orders'/>
+                <Menu.Item as={NavLink} to='/errors' name='Errors'/>
                 <Menu.Item>
                     <Button as={NavLink} to='/createOrder' positive content='Create Order' />
                 </Menu.Item>
