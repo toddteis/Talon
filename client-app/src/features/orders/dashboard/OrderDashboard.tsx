@@ -13,7 +13,7 @@ export default observer(function OrderDashboard() {
         if (orderRegistry.size <= 1) loadOrders();
     }, [orderRegistry.size, loadOrders])
 
-    if (orderStore.loadingInitial) return <LoadingComponent content='Loading app' />
+    if (orderStore.loadingInitial) return <LoadingComponent content='Loading orders...' />
 
     return (
         <Grid>
