@@ -36,7 +36,6 @@ export default observer(function NavBar() {
                     
                 </Menu.Menu>
 
-
                 <Menu.Item position='right'>
                     {userStore.isLoggedIn ? (
                         <Dropdown pointing='top left' text={userStore.user?.displayName}>
@@ -54,7 +53,6 @@ export default observer(function NavBar() {
 
                         </>
                     )}
-
                 </Menu.Item>
             </Container>
         </Menu>

@@ -19,6 +19,7 @@ import LoginForm from '../../features/users/LoginForm';
 import { useStore } from '../stores/store';
 import LoadingComponent from './LoadingComponent';
 import ModalContainer from '../common/modals/ModalContainer';
+import Footer from './Footer';
 
 
 function App() {
@@ -40,7 +41,7 @@ function App() {
       <ToastContainer position='bottom-right' hideProgressBar />
       <ModalContainer />
       <NavBar />
-      <Container style={{ marginTop: '7em' }}>
+      <Container style={{ marginTop: '4.2em', padding: '0 0 5em 0' }}>
         <Switch>
           <Route exact path='/' component={HomePage} />
           <Route path='/products' component={ProductsPage} />
@@ -57,6 +58,7 @@ function App() {
         </Switch>
 
       </Container>
+      <Footer />
     </>
   );
 }
